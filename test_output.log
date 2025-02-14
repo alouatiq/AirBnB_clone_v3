@@ -1,0 +1,37 @@
+..F./home/al/ALX/AirBnB_clone_v3/models/base_model.py:47: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  self.created_at = datetime.utcnow()
+..........F./home/al/ALX/AirBnB_clone_v3/models/base_model.py:57: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  self.updated_at = datetime.utcnow()
+.............................sss...F.s......................................................
+======================================================================
+FAIL: test_pep8_conformance_console (test_console.TestConsoleDocs.test_pep8_conformance_console)
+Test that console.py conforms to PEP8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/al/ALX/AirBnB_clone_v3/tests/test_console.py", line 19, in test_pep8_conformance_console
+    self.assertEqual(result.total_errors, 0,
+AssertionError: 5 != 0 : Found code style errors (and warnings).
+
+======================================================================
+FAIL: test_datetime_attributes (test_models.test_base_model.TestBaseModel.test_datetime_attributes)
+Test that two BaseModel instances have different datetime objects
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/al/ALX/AirBnB_clone_v3/tests/test_models/test_base_model.py", line 88, in test_datetime_attributes
+    self.assertTrue(tic <= inst1.created_at <= toc)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_pep8_conformance_file_storage (test_models.test_engine.test_file_storage.TestFileStorageDocs.test_pep8_conformance_file_storage)
+Test that models/engine/file_storage.py conforms to PEP8.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/al/ALX/AirBnB_clone_v3/tests/test_models/test_engine/test_file_storage.py", line 37, in test_pep8_conformance_file_storage
+    self.assertEqual(result.total_errors, 0,
+AssertionError: 1 != 0 : Found code style errors (and warnings).
+
+----------------------------------------------------------------------
+Ran 108 tests in 0.314s
+
+FAILED (failures=3, skipped=4)
+{'_sa_instance_state': <sqlalchemy.orm.state.InstanceState object at 0x7f6f10fd22d0>, 'id': 'caa67594-977e-4bb4-b77f-f7551d06cea5', 'created_at': datetime.datetime(2025, 2, 13, 9, 14, 4, 289780), 'updated_at': datetime.datetime(2025, 2, 13, 9, 14, 4, 289780)}
