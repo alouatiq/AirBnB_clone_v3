@@ -1,6 +1,9 @@
-#!/usr/bin/python
-from flask import Blueprint
+#!/usr/bin/python3
+"""Initialize Blueprint for views"""
 
-app_views = Blueprint('app_views', __name__, url_prefix='/api/v1')
+from flask import Blueprint  # Moved import to top
 
-from api.v1.views.index import *
+app_views = Blueprint("app_views", __name__, url_prefix="/api/v1")
+
+# Optionally import the routes after app_views is created:
+from api.v1.views.index import *  # Keep wildcard import if required
