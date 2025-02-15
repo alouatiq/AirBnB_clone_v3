@@ -11,8 +11,9 @@ from models.amenity import Amenity
 from flask import abort, request, jsonify
 
 
-@app_views.route("/cities/<city_id>/places", strict_slashes=False,
-                   methods=["GET"])
+@app_views.route(
+    "/cities/<city_id>/places", strict_slashes=False, methods=["GET"]
+)
 def places(city_id):
     """Retrieves the list of Place objects of a City"""
     city = storage.get(City, city_id)
@@ -24,8 +25,9 @@ def places(city_id):
     return jsonify(places_list)
 
 
-@app_views.route("/places/<place_id>", strict_slashes=False,
-                   methods=["GET"])
+@app_views.route(
+    "/places/<place_id>", strict_slashes=False, methods=["GET"]
+)
 def get_place(place_id):
     """Retrieves a Place object by its ID"""
     place = storage.get(Place, place_id)
@@ -34,8 +36,9 @@ def get_place(place_id):
     return jsonify(place.to_dict())
 
 
-@app_views.route("/places/<place_id>", strict_slashes=False,
-                   methods=["DELETE"])
+@app_views.route(
+    "/places/<place_id>", strict_slashes=False, methods=["DELETE"]
+)
 def place_delete(place_id):
     """Deletes a Place object by ID"""
     obj = storage.get(Place, place_id)
@@ -46,8 +49,9 @@ def place_delete(place_id):
     return jsonify({}), 200
 
 
-@app_views.route("/cities/<city_id>/places", strict_slashes=False,
-                   methods=["POST"])
+@app_views.route(
+    "/cities/<city_id>/places", strict_slashes=False, methods=["POST"]
+)
 def create_place(city_id):
     """Creates a new Place object linked to a given City"""
     city = storage.get(City, city_id)
@@ -68,8 +72,9 @@ def create_place(city_id):
     return jsonify(new_place.to_dict()), 201
 
 
-@app_views.route("/places/<place_id>", strict_slashes=False,
-                   methods=["PUT"])
+@app_views.route(
+    "/places/<place_id>", strict_slashes=False, methods=["PUT"]
+)
 def update_place(place_id):
     """Updates a Place object by ID"""
     place = storage.get(Place, place_id)
@@ -91,7 +96,9 @@ def update_place(place_id):
     return jsonify(place.to_dict()), 200
 
 
-@app_views.route("/places_search", methods=["POST"], strict_slashes=False)
+@app_views.route(
+    "/places_search", methods=["POST"], strict_slashes=False
+)
 def places_search():
     """
     Retrieves all Place objects based on search criteria provided in JSON body.
