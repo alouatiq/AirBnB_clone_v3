@@ -12,12 +12,12 @@ from flask import abort, request, jsonify
                  methods=["GET"])
 def user(user_id=None):
     """show user and user with id"""
-    users = []
+    user_list = []
     if user_id is None:
         all_objs = storage.all(User).values()
-        for val in all_objs:
-            users.append(val.to_dict())
-        return jsonify(users)
+        for v in all_objs:
+            user_list.append(v.to_dict())
+        return jsonify(user_list)
     else:
         result = storage.get(User, user_id)
         if result is None:
@@ -29,10 +29,10 @@ def user(user_id=None):
                  methods=["DELETE"])
 def user_delete(user_id):
     """delete method"""
-    target = storage.get(User, user_id)
-    if target is None:
+    obj = storage.get(User, user_id)
+    if obj is None:
         abort(404)
-    storage.delete(target)
+    storage.delete(obj)
     storage.save()
     return jsonify({}), 200
 
@@ -40,14 +40,14 @@ def user_delete(user_id):
 @app_views.route("/users", strict_slashes=False, methods=["POST"])
 def create_user():
     """create a new post req"""
-    data_input = request.get_json(force=True, silent=True)
-    if not data_input:
+    data = request.get_json(force=True, silent=True)
+    if not data:
         abort(400, "Not a JSON")
-    if "email" not in data_input:
+    if "email" not in data:
         abort(400, "Missing email")
-    if "password" not in data_input:
+    if "password" not in data:
         abort(400, "Missing password")
-    new_user = User(**data_input)
+    new_user = User(**data)
     new_user.save()
     return jsonify(new_user.to_dict()), 201
 
@@ -56,14 +56,14 @@ def create_user():
                  methods=["PUT"])
 def update_user(user_id):
     """update user"""
-    target = storage.get(User, user_id)
-    if target is None:
+    obj = storage.get(User, user_id)
+    if obj is None:
         abort(404)
     data = request.get_json(force=True, silent=True)
     if not data:
         abort(400, "Not a JSON")
-    target.password = data.get("password", target.password)
-    target.first_name = data.get("first_name", target.first_name)
-    target.last_name = data.get("last_name", target.last_name)
-    target.save()
-    return jsonify(target.to_dict()), 200
+    obj.password = data.get("password", obj.password)
+    obj.first_name = data.get("first_name", obj.first_name)
+    obj.last_name = data.get("last_name", obj.last_name)
+    obj.save()
+    return jsonify(obj.to_dict()), 200
