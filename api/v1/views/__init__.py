@@ -11,3 +11,5 @@ from api.v1.views.index import *  # Keep wildcard import if required
 
 # Import states routes
 from api.v1.views.states import *
+# Import cities routes
+from api.v1.views.cities import *
