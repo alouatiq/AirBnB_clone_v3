@@ -13,7 +13,7 @@ def get_cities_by_state(state_id):
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
-    # Iterate over all cities and filter those that belong to the state.
+    # Instead of relying on state.cities, iterate over all City objects
     cities = [city.to_dict() for city in storage.all(City).values() if city.state_id == state_id]
     return jsonify(cities)
 
@@ -44,14 +44,11 @@ def create_city(state_id):
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
-
     if not request.is_json:
         abort(400, description="Not a JSON")
     body = request.get_json()
-
     if 'name' not in body:
         abort(400, description="Missing name")
-
     new_city = City(**body)
     new_city.state_id = state_id
     new_city.save()
@@ -64,11 +61,9 @@ def update_city(city_id):
     city = storage.get(City, city_id)
     if city is None:
         abort(404)
-
     if not request.is_json:
         abort(400, description="Not a JSON")
     body = request.get_json()
-
     ignore_keys = {'id', 'state_id', 'created_at', 'updated_at'}
     for key, value in body.items():
         if key not in ignore_keys:
