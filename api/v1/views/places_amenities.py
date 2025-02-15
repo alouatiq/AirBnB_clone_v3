@@ -72,7 +72,8 @@ def link_place_amenity(place_id, amenity_id):
     """
     Links an Amenity object to a Place.
     No HTTP body is needed.
-    If the place_id or amenity_id is not linked to any object, raise a 404 error.
+    If the place_id or amenity_id is not linked to any object,
+    raise a 404 error.
     If the Amenity is already linked to the Place, return the Amenity
     with status code 200.
     Otherwise, link the Amenity and return it with status code 201.
