@@ -1,65 +1,82 @@
 #!/usr/bin/python3
-"""State objects that handles all default RESTFul API actions"""
-
+"""Place - Amenity view module: handles linking and unlinking Amenity objects for a Place"""
 from api.v1.views import app_views
+from flask import abort, jsonify, request
 from models import storage
+from models.place import Place
 from models.amenity import Amenity
-from flask import abort, request, jsonify
 
-
-@app_views.route("/amenities", strict_slashes=False, methods=["GET"])
-@app_views.route("/amenities/<amenity_id>", strict_slashes=False,
-                 methods=["GET"])
-def amenity(amenity_id=None):
-    """show amenity and amenity with id"""
-    amenity_list = []
-    if amenity_id is None:
-        all_objs = storage.all(Amenity).values()
-        for v in all_objs:
-            amenity_list.append(v.to_dict())
-        return jsonify(amenity_list)
-    else:
-        result = storage.get(Amenity, amenity_id)
-        if result is None:
-            abort(404)
-        return jsonify(result.to_dict())
-
-
-@app_views.route("/amenities/<amenity_id>", strict_slashes=False,
-                 methods=["DELETE"])
-def amenity_delete(amenity_id):
-    """delete method"""
-    obj = storage.get(Amenity, amenity_id)
-    if obj is None:
+@app_views.route("/places/<place_id>/amenities", methods=["GET"], strict_slashes=False)
+def get_place_amenities(place_id):
+    """
+    Retrieves the list of all Amenity objects of a Place.
+    If the place_id is not linked to any Place object, raise a 404 error.
+    """
+    place = storage.get(Place, place_id)
+    if not place:
         abort(404)
-    storage.delete(obj)
-    storage.save()
+    amenities_list = []
+    # For DBStorage, place.amenities is a relationship.
+    if hasattr(place, "amenities"):
+        for amenity in place.amenities:
+            amenities_list.append(amenity.to_dict())
+    else:
+        # For FileStorage, the Place object has a list attribute amenity_ids.
+        for amenity_id in place.amenity_ids:
+            amenity = storage.get(Amenity, amenity_id)
+            if amenity:
+                amenities_list.append(amenity.to_dict())
+    return jsonify(amenities_list)
+
+@app_views.route("/places/<place_id>/amenities/<amenity_id>", methods=["DELETE"], strict_slashes=False)
+def delete_place_amenity(place_id, amenity_id):
+    """
+    Deletes an Amenity object from a Place.
+    If the place_id or amenity_id is not linked to any object, or the Amenity is not linked to the Place, raise a 404 error.
+    Returns an empty dictionary with status code 200.
+    """
+    place = storage.get(Place, place_id)
+    if not place:
+        abort(404)
+    amenity = storage.get(Amenity, amenity_id)
+    if not amenity:
+        abort(404)
+    # Check if amenity is linked to the place.
+    if hasattr(place, "amenities"):
+        if amenity not in place.amenities:
+            abort(404)
+        place.amenities.remove(amenity)
+    else:
+        if amenity_id not in place.amenity_ids:
+            abort(404)
+        place.amenity_ids.remove(amenity_id)
+    place.save()
     return jsonify({}), 200
 
-
-@app_views.route("/amenities", strict_slashes=False, methods=["POST"])
-def create_amenity():
-    """create a new post req"""
-    data = request.get_json(force=True, silent=True)
-    if not data:
-        abort(400, "Not a JSON")
-    if "name" not in data:
-        abort(400, "Missing name")
-    new_amenity = Amenity(**data)
-    new_amenity.save()
-    return jsonify(new_amenity.to_dict()), 201
-
-
-@app_views.route("/amenities/<amenity_id>", strict_slashes=False,
-                 methods=["PUT"])
-def update_amenity(amenity_id):
-    """update amenity"""
-    obj = storage.get(Amenity, amenity_id)
-    if obj is None:
+@app_views.route("/places/<place_id>/amenities/<amenity_id>", methods=["POST"], strict_slashes=False)
+def link_place_amenity(place_id, amenity_id):
+    """
+    Link an Amenity object to a Place.
+    No HTTP body is needed.
+    If the place_id or amenity_id is not linked to any object, raise a 404 error.
+    If the Amenity is already linked to the Place, return the Amenity with status code 200.
+    Otherwise, link the Amenity and return it with status code 201.
+    """
+    place = storage.get(Place, place_id)
+    if not place:
         abort(404)
-    data = request.get_json(force=True, silent=True)
-    if not data:
-        abort(400, "Not a JSON")
-    obj.name = data.get("name", obj.name)
-    obj.save()
-    return jsonify(obj.to_dict()), 200
+    amenity = storage.get(Amenity, amenity_id)
+    if not amenity:
+        abort(404)
+    # For DBStorage: check if amenity is already linked via the relationship.
+    if hasattr(place, "amenities"):
+        if amenity in place.amenities:
+            return jsonify(amenity.to_dict()), 200
+        place.amenities.append(amenity)
+    else:
+        # For FileStorage: check if amenity_id is already in the amenity_ids list.
+        if amenity_id in place.amenity_ids:
+            return jsonify(amenity.to_dict()), 200
+        place.amenity_ids.append(amenity_id)
+    place.save()
+    return jsonify(amenity.to_dict()), 201
