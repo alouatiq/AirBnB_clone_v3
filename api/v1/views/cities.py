@@ -13,7 +13,9 @@ def get_cities_by_state(state_id):
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
-    return jsonify([city.to_dict() for city in state.cities])
+    # Iterate over all cities and filter those that belong to the state.
+    cities = [city.to_dict() for city in storage.all(City).values() if city.state_id == state_id]
+    return jsonify(cities)
 
 
 @app_views.route('/cities/<city_id>', methods=['GET'], strict_slashes=False)
